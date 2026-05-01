@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CELPIP Prep Tracker — CLB 7</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ── ROOT TOKENS ─────────────────────────────────────────────────────── */
+:root{
+  --ink:#0d0d1a;
+  --bg:#f5f3ef;
+  --card:#ffffff;
+  --p1:#6c47ff;   /* violet */
+  --p2:#ff5c7a;   /* coral */
+  --p3:#00c9a7;   /* mint */
+  --p4:#ffb830;   /* amber */
+  --p5:#3d7fff;   /* blue */
+  --muted:#8b8fa8;
+  --border:#e4e1f0;
+  --radius:18px;
+  --shadow:0 4px 32px rgba(108,71,255,.10);
+  --shadow-lg:0 12px 48px rgba(108,71,255,.18);
+  --font-head:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+
+/* ── RESET ───────────────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(–font-body);background:var(–bg);color:var(–ink);min-height:100vh;overflow-x:hidden}
+input,select,textarea,button{font-family:inherit}
+
+/* ── ANIMATED BACKGROUND BLOBS ───────────────────────────────────────── */
+.blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:drift 18s ease-in-out infinite alternate}
+.blob1{width:600px;height:600px;background:var(–p1);top:-150px;left:-100px;animation-delay:0s}
+.blob2{width:500px;height:500px;background:var(–p2);bottom:-100px;right:-80px;animation-delay:-6s}
+.blob3{width:400px;height:400px;background:var(–p3);top:40%;left:40%;animation-delay:-12s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.08)}}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────── */
+#app{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
+.sidebar{
+width:260px;min-width:260px;background:var(–ink);
+display:flex;flex-direction:column;padding:28px 0;
+position:sticky;top:0;height:100vh;overflow-y:auto;
+box-shadow:4px 0 40px rgba(0,0,0,.18);
+}
+.sidebar-logo{padding:0 24px 28px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-logo h1{font-family:var(–font-head);font-size:1.3rem;font-weight:800;color:#fff;line-height:1.2}
+.sidebar-logo span{font-size:.75rem;color:var(–p3);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.sidebar-logo .target-badge{
+display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+background:linear-gradient(135deg,var(–p1),var(–p2));
+color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;
+letter-spacing:.06em;text-transform:uppercase;
+}
+
+.nav-section{padding:20px 24px 6px;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);font-weight:600}
+.nav-item{
+display:flex;align-items:center;gap:12px;padding:11px 24px;
+cursor:pointer;color:rgba(255,255,255,.6);font-size:.88rem;font-weight:400;
+transition:all .2s;position:relative;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-item.active{color:#fff;background:linear-gradient(90deg,rgba(108,71,255,.35),transparent)}
+.nav-item.active::before{content:’’;position:absolute;left:0;top:0;bottom:0;width:3px;background:var(–p1);border-radius:0 3px 3px 0}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center}
+.nav-badge{margin-left:auto;background:var(–p1);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px}
+
+.sidebar-footer{margin-top:auto;padding:20px 24px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer .start-date-box{background:rgba(255,255,255,.06);border-radius:12px;padding:14px}
+.sidebar-footer label{font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px}
+.sidebar-footer input[type=date]{background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 10px;width:100%;font-size:.85rem}
+.sidebar-footer input[type=date]:focus{outline:none;border-color:var(–p1)}
+
+/* ── MAIN ────────────────────────────────────────────────────────────── */
+.main{flex:1;padding:32px 36px;overflow-y:auto}
+
+/* ── PAGE HEADER ─────────────────────────────────────────────────────── */
+.page-header{margin-bottom:32px}
+.page-header h2{font-family:var(–font-head);font-size:2rem;font-weight:800;line-height:1.1}
+.page-header p{color:var(–muted);font-size:.92rem;margin-top:6px}
+.gradient-text{background:linear-gradient(135deg,var(–p1),var(–p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── CARDS ───────────────────────────────────────────────────────────── */
+.card{background:var(–card);border-radius:var(–radius);padding:24px;box-shadow:var(–shadow);border:1px solid var(–border)}
+.card-title{font-family:var(–font-head);font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* ── STAT GRID ───────────────────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+border-radius:var(–radius);padding:20px 22px;color:#fff;position:relative;overflow:hidden;
+box-shadow:var(–shadow-lg);
+}
+.stat-card::after{content:’’;position:absolute;right:-20px;bottom:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.12)}
+.stat-card .stat-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;opacity:.8;margin-bottom:8px}
+.stat-card .stat-value{font-family:var(–font-head);font-size:2rem;font-weight:800;line-height:1}
+.stat-card .stat-sub{font-size:.75rem;opacity:.7;margin-top:4px}
+.s1{background:linear-gradient(135deg,#6c47ff,#9b6dff)}
+.s2{background:linear-gradient(135deg,#ff5c7a,#ff8fa3)}
+.s3{background:linear-gradient(135deg,#00c9a7,#00e6c0)}
+.s4{background:linear(135deg,#ffb830,#ffd47a)}
+.s4{background:linear-gradient(135deg,#ffb830,#ffd47a)}
+
+/* ── TABS ────────────────────────────────────────────────────────────── */
+.tab-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{
+padding:8px 18px;border-radius:30px;border:1.5px solid var(–border);
+background:transparent;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .2s;color:var(–muted);
+}
+.tab-btn:hover{border-color:var(–p1);color:var(–p1)}
+.tab-btn.active{background:var(–p1);color:#fff;border-color:var(–p1);box-shadow:0 4px 16px rgba(108,71,255,.35)}
+
+/* ── TABLE ───────────────────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(–border)}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead tr{background:var(–ink);color:#fff}
+thead th{padding:12px 14px;text-align:left;font-family:var(–font-head);font-size:.75rem;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(–border);transition:background .15s}
+tbody tr:hover{background:#f9f8ff}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:10px 14px;color:var(–ink);vertical-align:middle}
+.week-row td{background:linear-gradient(90deg,rgba(108,71,255,.08),rgba(108,71,255,.03));font-weight:700;font-size:.8rem;color:var(–p1)}
+
+/* ── INLINE EDITING ──────────────────────────────────────────────────── */
+td input,td select,td textarea{
+border:none;background:transparent;width:100%;font-size:.82rem;
+color:var(–ink);font-family:var(–font-body);padding:2px 4px;
+border-radius:6px;transition:background .15s;
+}
+td input:focus,td select:focus,td textarea:focus{
+background:rgba(108,71,255,.07);outline:2px solid var(–p1);outline-offset:1px;
+}
+td textarea{resize:none;min-height:34px}
+
+/* ── MODULE BADGES ───────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+.b-listen{background:#e9e3ff;color:#6c47ff}
+.b-read{background:#e0f9f3;color:#009e83}
+.b-write{background:#ffe8ec;color:#d93f5a}
+.b-speak{background:#fff3d6;color:#c48400}
+.b-mixed{background:#eef4ff;color:#3d7fff}
+.b-mock{background:#f3e0ff;color:#9030c0}
+.b-yes{background:#d4f7ed;color:#00845a}
+.b-no{background:#ffe4e8;color:#cc2244}
+
+/* ── PROGRESS BAR ────────────────────────────────────────────────────── */
+.prog-wrap{background:var(–border);border-radius:20px;overflow:hidden;height:8px;margin-top:6px}
+.prog-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(–p1),var(–p2));transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ── SCORE CHART ─────────────────────────────────────────────────────── */
+.chart-area{position:relative;height:240px;margin-top:12px}
+canvas{width:100%!important}
+
+/* ── FORM GRID ───────────────────────────────────────────────────────── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:.75rem;font-weight:600;color:var(–muted);text-transform:uppercase;letter-spacing:.08em}
+.form-group input,.form-group select,.form-group textarea{
+padding:10px 14px;border:1.5px solid var(–border);border-radius:10px;
+font-size:.88rem;color:var(–ink);background:var(–card);transition:border .2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+border-color:var(–p1);outline:none;box-shadow:0 0 0 3px rgba(108,71,255,.1);
+}
+.form-group.full{grid-column:1/-1}
+.btn-primary{
+background:linear-gradient(135deg,var(–p1),#9b6dff);color:#fff;
+border:none;border-radius:10px;padding:11px 24px;font-size:.9rem;font-weight:600;
+cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(108,71,255,.35);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(108,71,255,.4)}
+.btn-danger{background:#fff0f2;color:var(–p2);border:1.5px solid #ffd0d8;border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-danger:hover{background:var(–p2);color:#fff}
+.btn-sm{padding:5px 12px;border-radius:8px;border:1.5px solid var(–border);background:transparent;font-size:.75rem;cursor:pointer;font-weight:600;color:var(–muted);transition:all .2s}
+.btn-sm:hover{background:var(–p1);color:#fff;border-color:var(–p1)}
+
+/* ── RESOURCE TABLE ──────────────────────────────────────────────────── */
+.res-link{color:var(–p5);text-decoration:none;font-weight:500}
+.res-link:hover{text-decoration:underline}
+.priority-stars{color:var(–p4);letter-spacing:.1em}
+
+/* ── SCORE DISPLAY ───────────────────────────────────────────────────── */
+.score-pill{
+display:inline-flex;align-items:center;justify-content:center;
+width:34px;height:34px;border-radius:50%;font-family:var(–font-head);font-size:.85rem;font-weight:800;
+}
+.score-hi{background:#d4f7ed;color:#00845a}
+.score-mid{background:#fff3d6;color:#c48400}
+.score-lo{background:#ffe4e8;color:#cc2244}
+
+/* ── WEEKLY CARD GRID ────────────────────────────────────────────────── */
+.week-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.week-card{background:var(–card);border-radius:var(–radius);padding:20px;border:1.5px solid var(–border);box-shadow:var(–shadow);position:relative;overflow:hidden}
+.week-card::before{content:‘W’attr(data-week);position:absolute;right:16px;top:10px;font-family:var(–font-head);font-size:3rem;font-weight:800;opacity:.04;color:var(–ink)}
+.week-card h4{font-family:var(–font-head);font-size:.95rem;font-weight:700;margin-bottom:12px}
+.week-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.week-meta span{font-size:.74rem;background:var(–bg);border-radius:6px;padding:3px 8px;color:var(–muted)}
+.wc-input{border:1.5px solid var(–border);border-radius:8px;padding:7px 10px;font-size:.82rem;width:100%;margin-bottom:8px;font-family:var(–font-body);color:var(–ink)}
+.wc-input:focus{outline:none;border-color:var(–p1)}
+
+/* ── STUDY PLAN DAY ──────────────────────────────────────────────────── */
+.plan-day{
+display:grid;grid-template-columns:48px 90px 120px 1fr 80px 60px;
+gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(–border);
+transition:background .15s;
+}
+.plan-day:hover{background:#faf9ff}
+.plan-day.completed{opacity:.55}
+.plan-day.completed .day-num{background:var(–p3);color:#fff}
+.plan-day.week-break{background:linear-gradient(90deg,rgba(108,71,255,.06),transparent);font-weight:700;font-size:.8rem;color:var(–p1)}
+.day-num{width:34px;height:34px;border-radius:50%;background:var(–bg);border:2px solid var(–border);display:flex;align-items:center;justify-content:center;font-family:var(–font-head);font-size:.8rem;font-weight:800;flex-shrink:0}
+.plan-tasks{font-size:.8rem;color:#555;line-height:1.5}
+.plan-check{width:20px;height:20px;accent-color:var(–p1);cursor:pointer}
+
+/* ── DASHBOARD MODULE CIRCLES ────────────────────────────────────────── */
+.module-circles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.module-circle-card{
+background:var(–card);border-radius:var(–radius);padding:20px;text-align:center;
+border:1.5px solid var(–border);box-shadow:var(–shadow);
+}
+.circle-svg{display:block;margin:0 auto 10px;transform:rotate(-90deg)}
+.circle-bg{fill:none;stroke:var(–border);stroke-width:6}
+.circle-fg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.c-listen .circle-fg{stroke:var(–p1)}
+.c-read   .circle-fg{stroke:var(–p3)}
+.c-write  .circle-fg{stroke:var(–p2)}
+.c-speak  .circle-fg{stroke:var(–p4)}
+.circle-label{font-family:var(–font-head);font-size:.85rem;font-weight:700}
+.circle-sub{font-size:.72rem;color:var(–muted);margin-top:3px}
+.circle-pct{font-family:var(–font-head);font-size:1.2rem;font-weight:800;margin-top:6px}
+
+/* ── RESOURCE CARDS ──────────────────────────────────────────────────── */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.res-card{
+background:var(–card);border-radius:14px;padding:18px;border:1.5px solid var(–border);
+box-shadow:var(–shadow);transition:all .2s;position:relative;overflow:hidden;
+}
+.res-card:hover{transform:translateY(-3px);box-shadow:var(–shadow-lg);border-color:var(–p1)}
+.res-card-tag{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:inline-block;padding:3px 8px;border-radius:6px}
+.res-card h5{font-family:var(–font-head);font-size:.9rem;font-weight:700;margin-bottom:6px;line-height:1.3}
+.res-card p{font-size:.78rem;color:var(–muted);line-height:1.5;margin-bottom:12px}
+.res-card a{font-size:.78rem;font-weight:600;color:var(–p1);text-decoration:none}
+.res-card a:hover{text-decoration:underline}
+
+/* ── TOAST ───────────────────────────────────────────────────────────── */
+.toast{
+position:fixed;bottom:28px;right:28px;background:var(–ink);color:#fff;
+padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:500;
+transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:999;
+display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:1rem}
+
+/* ── PAGE SECTIONS ───────────────────────────────────────────────────── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media(max-width:900px){
+.stat-grid{grid-template-columns:repeat(2,1fr)}
+.module-circles{grid-template-columns:repeat(2,1fr)}
+.week-cards{grid-template-columns:1fr}
+.res-grid{grid-template-columns:1fr 1fr}
+.form-grid{grid-template-columns:1fr}
+.sidebar{width:220px;min-width:220px}
+.main{padding:24px 20px}
+}
+@media(max-width:640px){
+#app{flex-direction:column}
+.sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px}
+.sidebar-logo{display:none}
+.nav-item{padding:8px 14px;font-size:.8rem}
+.stat-grid{grid-template-columns:1fr 1fr}
+.module-circles{grid-template-columns:1fr 1fr}
+.res-grid{grid-template-columns:1fr}
+.plan-day{grid-template-columns:36px 1fr 80px 50px}
+}
+
+/* ── ANIMATIONS ──────────────────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.page.active .card,.page.active .stat-card,.page.active .week-card,.page.active .res-card{animation:fadeUp .35s ease both}
+.page.active .stat-card:nth-child(2){animation-delay:.05s}
+.page.active .stat-card:nth-child(3){animation-delay:.10s}
+.page.active .stat-card:nth-child(4){animation-delay:.15s}
+
+/* ── TWO-COL LAYOUT ──────────────────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.two-col{grid-template-columns:1fr}}
+</style>
+
+</head>
+<body>
+
+<div class="blobs"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
+
+<div id="app">
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>CELPIP<br>Prep Tracker</h1>
+    <span>Personal Study System</span><br>
+    <span class="target-badge">🎯 CLB 7 Goal</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">🏠</span>Dashboard</button>
+  <button class="nav-item" onclick="showPage('daily',this)"><span class="icon">📅</span>Daily Tracker<span class="nav-badge" id="nb-daily">0</span></button>
+  <button class="nav-item" onclick="showPage('weekly',this)"><span class="icon">🗓️</span>Weekly Planner</button>
+  <button class="nav-item" onclick="showPage('scores',this)"><span class="icon">📈</span>Score Tracker</button>
+
+  <div class="nav-section">Content</div>
+  <button class="nav-item" onclick="showPage('plan',this)"><span class="icon">📋</span>Study Plan</button>
+  <button class="nav-item" onclick="showPage('resources',this)"><span class="icon">📚</span>Resources</button>
+
+  <div class="sidebar-footer">
+    <div class="start-date-box">
+      <label>Study Start Date</label>
+      <input type="date" id="globalStartDate" onchange="updateStartDate()" />
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════════════════ -->
+
+<main class="main">
+
+<!-- ─ DASHBOARD ───────────────────────────────────────────────────────── -->
+
+<section class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h2>Good <span class="gradient-text" id="greet-time">morning</span>! 👋</h2>
+    <p>Your CELPIP CLB 7 prep overview — <span id="dash-date"></span></p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card s1"><div class="stat-label">Days Logged</div><div class="stat-value" id="stat-days">0</div><div class="stat-sub">of 56 total days</div></div>
+    <div class="stat-card s2"><div class="stat-label">Mock Tests</div><div class="stat-value" id="stat-mocks">0</div><div class="stat-sub">completed</div></div>
+    <div class="stat-card s3"><div class="stat-label">Avg Score</div><div class="stat-value" id="stat-avg">—</div><div class="stat-sub">last mock test</div></div>
+    <div class="stat-card s4"><div class="stat-label">Plan Done</div><div class="stat-value" id="stat-plan">0%</div><div class="stat-sub">study plan progress</div></div>
+  </div>
+
+  <div class="module-circles">
+    <div class="module-circle-card c-listen">
+      <svg class="circle-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle class="circle-bg" cx="36" cy="36" r="30"/>
+        <circle class="circle-fg" cx="36" cy="36" r="30" stroke-dasharray="188.5" id="circ-listen" stroke-dashoffset="188.5"/>
+      </svg>
+      <div class="circle-label">🎧 Listening</div>
+      <div class="circle-sub">Avg practice time</div>
+      <div class="circle-pct" id="circ-listen-val">0 min</div>
+    </div>
+    <div class="module-circle-card c-read">
+      <svg class="circle-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle class="circle-bg" cx="36" cy="36" r="30"/>
+        <circle class="circle-fg" cx="36" cy="36" r="30" stroke-dasharray="188.5" id="circ-read" stroke-dashoffset="188.5"/>
+      </svg>
+      <div class="circle-label">📖 Reading</div>
+      <div class="circle-sub">Avg practice time</div>
+      <div class="circle-pct" id="circ-read-val">0 min</div>
+    </div>
+    <div class="module-circle-card c-write">
+      <svg class="circle-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle class="circle-bg" cx="36" cy="36" r="30"/>
+        <circle class="circle-fg" cx="36" cy="36" r="30" stroke-dasharray="188.5" id="circ-write" stroke-dashoffset="188.5"/>
+      </svg>
+      <div class="circle-label">✍️ Writing</div>
+      <div class="circle-sub">Avg practice time</div>
+      <div class="circle-pct" id="circ-write-val">0 min</div>
+    </div>
+    <div class="module-circle-card c-speak">
+      <svg class="circle-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle class="circle-bg" cx="36" cy="36" r="30"/>
+        <circle class="circle-fg" cx="36" cy="36" r="30" stroke-dasharray="188.5" id="circ-speak" stroke-dashoffset="188.5"/>
+      </svg>
+      <div class="circle-label">🗣️ Speaking</div>
+      <div class="circle-sub">Avg practice time</div>
+      <div class="circle-pct" id="circ-speak-val">0 min</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">📈 Score Progress</div>
+      <div class="chart-area"><canvas id="dashChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 CLB 7 Requirements</div>
+      <div style="display:grid;gap:12px;margin-top:4px">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.83rem;font-weight:600">🎧 Listening — Score 7/12</span><span style="font-size:.8rem;color:var(--muted)" id="prog-l-val"></span></div><div class="prog-wrap"><div class="prog-bar" id="prog-l" style="width:0%;background:linear-gradient(90deg,var(--p1),#9b6dff)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.83rem;font-weight:600">📖 Reading — Score 7/12</span><span style="font-size:.8rem;color:var(--muted)" id="prog-r-val"></span></div><div class="prog-wrap"><div class="prog-bar" id="prog-r" style="width:0%;background:linear-gradient(90deg,var(--p3),#00e6c0)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.83rem;font-weight:600">✍️ Writing — Score 7/12</span><span style="font-size:.8rem;color:var(--muted)" id="prog-w-val"></span></div><div class="prog-wrap"><div class="prog-bar" id="prog-w" style="width:0%;background:linear-gradient(90deg,var(--p2),#ff8fa3)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.83rem;font-weight:600">🗣️ Speaking — Score 7/12</span><span style="font-size:.8rem;color:var(--muted)" id="prog-s-val"></span></div><div class="prog-wrap"><div class="prog-bar" id="prog-s" style="width:0%;background:linear-gradient(90deg,var(--p4),#ffd47a)"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─ DAILY TRACKER ────────────────────────────────────────────────────── -->
+
+<section class="page" id="page-daily">
+  <div class="page-header">
+    <h2>Daily <span class="gradient-text">Tracker</span></h2>
+    <p>Log each study session — all cells are directly editable</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">➕ Add Today's Session</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="f-date"/></div>
+      <div class="form-group"><label>Listening (mins)</label><input type="number" id="f-listen" placeholder="e.g. 45" min="0" max="300"/></div>
+      <div class="form-group"><label>Reading (mins)</label><input type="number" id="f-read" placeholder="e.g. 45" min="0" max="300"/></div>
+      <div class="form-group"><label>Speaking (mins)</label><input type="number" id="f-speak" placeholder="e.g. 45" min="0" max="300"/></div>
+      <div class="form-group"><label>Writing Task Type</label>
+        <select id="f-wtask"><option value="">-- select --</option><option>Task 1 - Email</option><option>Task 2 - Survey Response</option><option>Both</option></select>
+      </div>
+      <div class="form-group"><label>Writing Word Count</label><input type="number" id="f-wwords" placeholder="e.g. 180" min="0"/></div>
+      <div class="form-group"><label>Mock Test Taken</label>
+        <select id="f-mock"><option value="No">No</option><option value="Yes">Yes</option></select>
+      </div>
+      <div class="form-group"><label>Score (L / R / W / S)</label><input type="text" id="f-score" placeholder="e.g. 7/6/7/6"/></div>
+      <div class="form-group"><label>Weak Areas</label>
+        <select id="f-weak"><option value="">-- none --</option><option>Listening</option><option>Reading</option><option>Writing</option><option>Speaking</option><option>Vocabulary</option><option>Grammar</option><option>Pronunciation</option><option>Fluency</option></select>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="f-notes" rows="2" placeholder="Any observations, strategies tried, etc."></textarea></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px">
+      <button class="btn-primary" onclick="addDailyEntry()">💾 Save Entry</button>
+      <button class="btn-sm" onclick="clearDailyForm()">Clear Form</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 All Sessions <span style="margin-left:auto;font-size:.75rem;font-weight:400;color:var(--muted)">Click any cell to edit directly</span></div>
+    <div class="tbl-wrap"><table id="daily-table">
+      <thead><tr><th>Date</th><th>Day</th><th>Listen</th><th>Read</th><th>Writing Task</th><th>Words</th><th>Speak</th><th>Mock</th><th>Score</th><th>Weak Area</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="daily-body"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ─ WEEKLY PLANNER ──────────────────────────────────────────────────── -->
+
+<section class="page" id="page-weekly">
+  <div class="page-header">
+    <h2>Weekly <span class="gradient-text">Planner</span></h2>
+    <p>Set goals, track mock tests and improvements week by week</p>
+  </div>
+  <div class="week-cards" id="week-cards-container"></div>
+</section>
+
+<!-- ─ SCORE TRACKER ───────────────────────────────────────────────────── -->
+
+<section class="page" id="page-scores">
+  <div class="page-header">
+    <h2>Score <span class="gradient-text">Tracker</span></h2>
+    <p>Enter mock test scores — chart auto-updates</p>
+  </div>
+  <div class="two-col" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-title">➕ Add Score Entry</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Date</label><input type="date" id="sc-date"/></div>
+        <div class="form-group"><label>Listening Score (0-12)</label><input type="number" id="sc-l" min="0" max="12" placeholder="e.g. 7"/></div>
+        <div class="form-group"><label>Reading Score (0-12)</label><input type="number" id="sc-r" min="0" max="12" placeholder="e.g. 7"/></div>
+        <div class="form-group"><label>Writing Score (0-12)</label><input type="number" id="sc-w" min="0" max="12" placeholder="e.g. 7"/></div>
+        <div class="form-group"><label>Speaking Score (0-12)</label><input type="number" id="sc-s" min="0" max="12" placeholder="e.g. 7"/></div>
+        <div class="form-group"><label>Notes</label><input type="text" id="sc-notes" placeholder="Mock test notes"/></div>
+      </div>
+      <div style="margin-top:14px"><button class="btn-primary" onclick="addScoreEntry()">💾 Save Score</button></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Score Averages</div>
+      <div id="score-avg-display" style="display:grid;gap:10px;margin-top:6px"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📈 Progression Chart</div>
+    <div class="chart-area" style="height:280px"><canvas id="scoreChart"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">📋 Score History <span style="margin-left:auto;font-size:.75rem;color:var(--muted);font-weight:400">All cells editable</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Speaking</th><th>CLB Est.</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="score-body"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ─ STUDY PLAN ──────────────────────────────────────────────────────── -->
+
+<section class="page" id="page-plan">
+  <div class="page-header">
+    <h2>56-Day Study <span class="gradient-text">Plan</span></h2>
+    <p>Check off each day — tasks are editable</p>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div><span style="font-size:.83rem;font-weight:600">Days Completed: </span><strong id="plan-count">0</strong> / 56</div>
+      <div style="flex:1;max-width:300px"><div class="prog-wrap"><div class="prog-bar" id="plan-prog" style="width:0%"></div></div></div>
+      <button class="btn-sm" onclick="resetPlan()">↺ Reset All</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tab-bar" style="padding:16px 16px 0">
+      <button class="tab-btn active" onclick="filterPlan('all',this)">All 8 Weeks</button>
+      <button class="tab-btn" onclick="filterPlan('pending',this)">⏳ Pending</button>
+      <button class="tab-btn" onclick="filterPlan('done',this)">✅ Done</button>
+    </div>
+    <div id="plan-container"></div>
+  </div>
+</section>
+
+<!-- ─ RESOURCES ───────────────────────────────────────────────────────── -->
+
+<section class="page" id="page-resources">
+  <div class="page-header">
+    <h2>Study <span class="gradient-text">Resources</span></h2>
+    <p>Official & top-rated CELPIP preparation materials</p>
+  </div>
+  <div class="tab-bar" id="res-tabs">
+    <button class="tab-btn active" onclick="filterRes('all',this)">All</button>
+    <button class="tab-btn" onclick="filterRes('Listening',this)">🎧 Listening</button>
+    <button class="tab-btn" onclick="filterRes('Reading',this)">📖 Reading</button>
+    <button class="tab-btn" onclick="filterRes('Writing',this)">✍️ Writing</button>
+    <button class="tab-btn" onclick="filterRes('Speaking',this)">🗣️ Speaking</button>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">➕ Add Resource</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Module</label>
+        <select id="rmod"><option>Listening</option><option>Reading</option><option>Writing</option><option>Speaking</option><option>All Modules</option></select>
+      </div>
+      <div class="form-group"><label>Type</label>
+        <select id="rtype"><option>YouTube</option><option>Website</option><option>App</option><option>Book</option><option>PDF</option><option>Community</option></select>
+      </div>
+      <div class="form-group"><label>Name</label><input type="text" id="rname" placeholder="Resource name"/></div>
+      <div class="form-group"><label>URL</label><input type="text" id="rurl" placeholder="https://..."/></div>
+      <div class="form-group full"><label>Notes</label><input type="text" id="rnotes" placeholder="Brief description"/></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn-primary" onclick="addResource()">➕ Add Resource</button></div>
+  </div>
+  <div class="res-grid" id="res-grid"></div>
+</section>
+
+</main><!-- end .main -->
+</div><!-- end #app -->
+
+<div class="toast" id="toast"><span class="toast-icon">✅</span><span id="toast-msg">Saved!</span></div>
+
+<!-- Chart.js -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   DATA LAYER  — localStorage persistence
+══════════════════════════════════════════════════════════════════════ */
+const KEYS = {
+  startDate: 'celpip_start',
+  daily:     'celpip_daily',
+  weekly:    'celpip_weekly',
+  scores:    'celpip_scores',
+  plan:      'celpip_plan',
+  resources: 'celpip_resources',
+};
+
+function load(key, def){ try{const v=localStorage.getItem(key);return v?JSON.parse(v):def}catch{return def} }
+function save(key, val){ localStorage.setItem(key, JSON.stringify(val)) }
+
+let state = {
+  startDate: load(KEYS.startDate, '2026-05-01'),
+  daily:     load(KEYS.daily, []),
+  weekly:    load(KEYS.weekly, buildDefaultWeekly()),
+  scores:    load(KEYS.scores, []),
+  plan:      load(KEYS.plan, buildDefaultPlan()),
+  resources: load(KEYS.resources, defaultResources()),
+};
+
+function saveAll(){
+  save(KEYS.startDate, state.startDate);
+  save(KEYS.daily,     state.daily);
+  save(KEYS.weekly,    state.weekly);
+  save(KEYS.scores,    state.scores);
+  save(KEYS.plan,      state.plan);
+  save(KEYS.resources, state.resources);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DATE HELPERS
+══════════════════════════════════════════════════════════════════════ */
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function addDays(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n); return d.toISOString().slice(0,10);
+}
+function dayOfWeek(dateStr){ return DAYS[new Date(dateStr+'T00:00:00').getDay()] }
+function fmtDate(dateStr){
+  if(!dateStr) return '';
+  const d = new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DEFAULT DATA BUILDERS
+══════════════════════════════════════════════════════════════════════ */
+function buildDefaultWeekly(){
+  const goals = [
+    "Master CELPIP Listening format; attempt Part 1-3 tasks daily",
+    "Build reading speed; practice 6 CELPIP-style passages per week",
+    "Write 5 Task-1 emails (150-200 words); target CLB 7 criteria",
+    "Record 3-min speaking samples daily; self-assess with rubric",
+    "Mixed practice: timed listening + reading comprehension drills",
+    "Full writing revision: Task 1 & Task 2 under timed conditions",
+    "Complete 2 full mock tests; analyse score gaps per module",
+    "Final consolidation: target weakest module + 1 full mock test",
+  ];
+  const foci = ["Listening","Reading","Writing","Speaking","Mixed","Writing","Mixed","All Modules"];
+  return Array.from({length:8},(_,i)=>({
+    week:i+1, focus:foci[i], goal:goals[i],
+    planned: i<6?2:3, completed:'', improvements:'', challenges:''
+  }));
+}
+
+function buildDefaultPlan(){
+  const mods = ["Listening","Reading","Writing","Speaking","Mixed Review","Mock Test","Mock Review"];
+  const taskMap = {
+    0:["Listen to 2 CELPIP audio clips (Parts 1-3). Answer all questions. Review errors & note vocabulary. 15-min shadowing.","Listen to FULL CELPIP Listening section timed. Analyse errors. Vocabulary journal. 20-min shadowing."],
+    1:["Read 2 CELPIP-style passages (10 min each). Answer comprehension questions & review.","Full CELPIP Reading section timed (50 min). Error analysis. Build vocabulary from context."],
+    2:["Task 1: Write a formal/informal email (150-200 words) in 27 min. Self-assess using CLB 7 rubric.","Task 1 + Task 2 back-to-back (27+26 min). Self-score for coherence & vocabulary range."],
+    3:["Parts 1-3 Speaking: personal experience, advice, scene description. Record & self-assess.","Full speaking simulation Parts 1-8. Record & compare to CLB 7 samples. Pronunciation drills."],
+    4:["30 min Listening drills. 30 min Reading speed. Review week's writing. 30 min speaking warm-up. Vocab flashcards.","30 min Listening drills. 30 min Reading speed. Review week's writing. 30 min speaking warm-up. Vocab flashcards."],
+    5:["📝 FULL MOCK TEST — Listening + Reading (timed). Record scores. Identify weak areas.","Extended writing: 2× Task 1 emails + 1× Task 2 survey. Word-count check. Grammar self-review."],
+    6:["📝 FULL MOCK TEST — Writing + Speaking (timed). Enter all scores in Score Tracker.","Review all mock test errors. Re-do 5 incorrect Qs per module. Update weak areas in Daily Tracker."]
+  };
+  const times = {0:180,1:180,2:200,3:180,4:180,5:210,6:180};
+  const items = [];
+  for(let w=0;w<8;w++) for(let d=0;d<7;d++){
+    const t = taskMap[d][w<4?0:1];
+    items.push({ day:w*7+d+1, week:w+1, dow:d, mod:mods[d], task:t, time:times[d], done:false });
+  }
+  return items;
+}
+
+function defaultResources(){
+  return [
+    {mod:"All Modules",type:"Official",name:"CELPIP Official — Tests & Info",url:"https://www.celpip.ca",notes:"Free sample tests, score guides, FAQs",stars:3},
+    {mod:"All Modules",type:"Official",name:"CELPIP Store — Paid Practice Tests",url:"https://store.celpip.ca",notes:"Full-length official practice tests (most realistic)",stars:3},
+    {mod:"All Modules",type:"YouTube",name:"CELPIP Official YouTube",url:"https://www.youtube.com/@CELPIPTest",notes:"Official tips, sample tasks, rater commentary",stars:3},
+    {mod:"Listening",type:"YouTube",name:"English with Lucy",url:"https://www.youtube.com/@EnglishwithLucy",notes:"Accent training, comprehension exercises",stars:2},
+    {mod:"Listening",type:"Website",name:"BBC Learning English",url:"https://www.bbc.co.uk/learningenglish",notes:"Varied accents; news-based comprehension",stars:2},
+    {mod:"Reading",type:"Website",name:"Breaking News English",url:"https://www.breakingnewsenglish.com",notes:"Levelled news articles with comprehension Qs",stars:2},
+    {mod:"Reading",type:"YouTube",name:"E2 Language — CELPIP Reading",url:"https://www.youtube.com/@E2Language",notes:"Strategy videos specific to CELPIP format",stars:2},
+    {mod:"Writing",type:"YouTube",name:"Presto English — Writing Tips",url:"https://www.youtube.com/@PrestoEnglish",notes:"Task 1 & Task 2 walkthroughs with scoring",stars:3},
+    {mod:"Writing",type:"Website",name:"Grammarly (free)",url:"https://www.grammarly.com",notes:"Grammar & spell check for writing practice",stars:2},
+    {mod:"Speaking",type:"YouTube",name:"English with Kiki — Speaking",url:"https://www.youtube.com/@EnglishwithKiki",notes:"CLB 7-9 speaking sample responses",stars:3},
+    {mod:"Speaking",type:"App",name:"ELSA Speak",url:"https://elsaspeak.com",notes:"AI pronunciation & fluency coach",stars:2},
+    {mod:"All Modules",type:"Community",name:"Reddit r/CELPIP",url:"https://www.reddit.com/r/CELPIP/",notes:"Peer tips, score reports, resource sharing",stars:2},
+    {mod:"All Modules",type:"PDF",name:"CELPIP Score Descriptors",url:"https://www.celpip.ca/wp-content/uploads/2016/10/CELPIP-General-Descriptors.pdf",notes:"Official CLB level descriptors — read before every practice",stars:3},
+  ];
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════════════════ */
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='daily')     renderDaily();
+  if(id==='weekly')    renderWeekly();
+  if(id==='scores')    renderScores();
+  if(id==='plan')      renderPlan('all');
+  if(id==='resources') renderResources('all');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════════════════ */
+let toastTimer;
+function toast(msg,icon='✅'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.querySelector('.toast-icon').textContent=icon;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   START DATE
+══════════════════════════════════════════════════════════════════════ */
+function updateStartDate(){
+  state.startDate = document.getElementById('globalStartDate').value || '2026-05-01';
+  saveAll(); renderDashboard(); toast('Start date updated ✓');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════════════════ */
+let dashChartInst;
+function renderDashboard(){
+  const h = new Date().getHours();
+  document.getElementById('greet-time').textContent = h<12?'morning':h<18?'afternoon':'evening';
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  // Stats
+  const logged = state.daily.filter(r=>r.date).length;
+  const mocks  = state.daily.filter(r=>r.mock==='Yes').length;
+  const done   = state.plan.filter(r=>r.done).length;
+  document.getElementById('stat-days').textContent  = logged;
+  document.getElementById('stat-mocks').textContent = mocks;
+  document.getElementById('stat-plan').textContent  = Math.round(done/56*100)+'%';
+
+  // Avg score from score tracker
+  const scores = state.scores.filter(s=>s.l||s.r||s.w||s.s);
+  if(scores.length){
+    const last = scores[scores.length-1];
+    const avg = ((+last.l||0)+(+last.r||0)+(+last.w||0)+(+last.s||0))/4;
+    document.getElementById('stat-avg').textContent = avg.toFixed(1);
+  } else document.getElementById('stat-avg').textContent='—';
+
+  // Module circles (avg mins vs 60 min target)
+  const fields={listen:'circ-listen',read:'circ-read',write:'circ-write',speak:'circ-speak'};
+  const labels={listen:'circ-listen-val',read:'circ-read-val',write:'circ-write-val',speak:'circ-speak-val'};
+  const TARGET=60;
+  ['listen','read','write','speak'].forEach(k=>{
+    const vals = state.daily.map(r=>+r[k]||0).filter(v=>v>0);
+    const avg  = vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+    const pct  = Math.min(avg/TARGET,1);
+    const circ = document.getElementById(fields[k]);
+    const circumference = 188.5;
+    circ.style.strokeDashoffset = circumference*(1-pct);
+    document.getElementById(labels[k]).textContent = avg+' min';
+  });
+
+  // Progress bars toward CLB 7
+  const scoreAvgs = {l:0,r:0,w:0,s:0};
+  if(scores.length){
+    scoreAvgs.l = scores.reduce((a,b)=>a+(+b.l||0),0)/scores.length;
+    scoreAvgs.r = scores.reduce((a,b)=>a+(+b.r||0),0)/scores.length;
+    scoreAvgs.w = scores.reduce((a,b)=>a+(+b.w||0),0)/scores.length;
+    scoreAvgs.s = scores.reduce((a,b)=>a+(+b.s||0),0)/scores.length;
+  }
+  const bars = [{id:'prog-l',val:'prog-l-val',k:'l'},{id:'prog-r',val:'prog-r-val',k:'r'},
+                {id:'prog-w',val:'prog-w-val',k:'w'},{id:'prog-s',val:'prog-s-val',k:'s'}];
+  bars.forEach(({id,val,k})=>{
+    const v = scoreAvgs[k]||0;
+    document.getElementById(id).style.width = Math.min(v/7*100,100)+'%';
+    document.getElementById(val).textContent = v>0?`Avg: ${v.toFixed(1)} / 7`:'No data yet';
+  });
+
+  // Chart
+  renderDashChart();
+}
+
+function renderDashChart(){
+  const ctx = document.getElementById('dashChart').getContext('2d');
+  if(dashChartInst) dashChartInst.destroy();
+  const sc = state.scores.slice(-8);
+  dashChartInst = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: sc.length ? sc.map(s=>fmtDate(s.date)) : ['No data yet'],
+      datasets:[
+        {label:'Listening',data:sc.map(s=>+s.l||null),borderColor:'#6c47ff',backgroundColor:'rgba(108,71,255,.08)',tension:.4,fill:true},
+        {label:'Reading',  data:sc.map(s=>+s.r||null),borderColor:'#00c9a7',backgroundColor:'rgba(0,201,167,.08)',tension:.4,fill:true},
+        {label:'Writing',  data:sc.map(s=>+s.w||null),borderColor:'#ff5c7a',backgroundColor:'rgba(255,92,122,.08)',tension:.4,fill:true},
+        {label:'Speaking', data:sc.map(s=>+s.s||null),borderColor:'#ffb830',backgroundColor:'rgba(255,184,48,.08)',tension:.4,fill:true},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{min:0,max:12,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11}}},
+              x:{grid:{display:false},ticks:{font:{size:10}}}},
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}},
+               tooltip:{mode:'index',intersect:false}}}
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DAILY TRACKER
+══════════════════════════════════════════════════════════════════════ */
+function addDailyEntry(){
+  const date = document.getElementById('f-date').value;
+  if(!date){toast('Please select a date','⚠️');return;}
+  state.daily.push({
+    date, listen:document.getElementById('f-listen').value,
+    read:document.getElementById('f-read').value,
+    wtask:document.getElementById('f-wtask').value,
+    wwords:document.getElementById('f-wwords').value,
+    speak:document.getElementById('f-speak').value,
+    mock:document.getElementById('f-mock').value,
+    score:document.getElementById('f-score').value,
+    weak:document.getElementById('f-weak').value,
+    notes:document.getElementById('f-notes').value,
+  });
+  saveAll(); clearDailyForm(); renderDaily();
+  document.getElementById('nb-daily').textContent=state.daily.length;
+  toast('Session saved!');
+}
+
+function clearDailyForm(){
+  ['f-date','f-listen','f-read','f-wwords','f-speak','f-score','f-notes'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('f-wtask').value='';
+  document.getElementById('f-mock').value='No';
+  document.getElementById('f-weak').value='';
+}
+
+function deleteDailyRow(idx){
+  if(!confirm('Delete this entry?')) return;
+  state.daily.splice(idx,1); saveAll(); renderDaily();
+  document.getElementById('nb-daily').textContent=state.daily.length;
+  toast('Entry deleted','🗑️');
+}
+
+const modBadge={
+  'Task 1 - Email':'<span class="badge b-write">Task 1</span>',
+  'Task 2 - Survey Response':'<span class="badge b-write">Task 2</span>',
+  'Both':'<span class="badge b-write">Both</span>',
+  'Yes':'<span class="badge b-yes">Yes</span>',
+  'No':'<span class="badge b-no">No</span>',
+};
+
+function renderDaily(){
+  const tbody = document.getElementById('daily-body');
+  if(!state.daily.length){
+    tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--muted)">No sessions logged yet — add your first session above!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = state.daily.map((r,i)=>{
+    const lo = (+r.listen||0)<30 && +r.listen>0;
+    const ro = (+r.read||0)<30 && +r.read>0;
+    const so = (+r.speak||0)<30 && +r.speak>0;
+    return `<tr>
+      <td><input type="date" value="${r.date||''}" onchange="updateDaily(${i},'date',this.value)"/></td>
+      <td style="color:var(--muted);font-size:.78rem">${r.date?dayOfWeek(r.date):''}</td>
+      <td style="background:${lo?'rgba(255,217,102,.3)':''}"><input type="number" value="${r.listen||''}" min="0" placeholder="—" onchange="updateDaily(${i},'listen',this.value)" style="width:52px"/></td>
+      <td style="background:${ro?'rgba(255,217,102,.3)':''}"><input type="number" value="${r.read||''}" min="0" placeholder="—" onchange="updateDaily(${i},'read',this.value)" style="width:52px"/></td>
+      <td><select onchange="updateDaily(${i},'wtask',this.value)">
+        <option value="">—</option>
+        <option ${r.wtask==='Task 1 - Email'?'selected':''}>Task 1 - Email</option>
+        <option ${r.wtask==='Task 2 - Survey Response'?'selected':''}>Task 2 - Survey Response</option>
+        <option ${r.wtask==='Both'?'selected':''}>Both</option>
+      </select></td>
+      <td><input type="number" value="${r.wwords||''}" min="0" placeholder="—" onchange="updateDaily(${i},'wwords',this.value)" style="width:60px"/></td>
+      <td style="background:${so?'rgba(255,217,102,.3)':''}"><input type="number" value="${r.speak||''}" min="0" placeholder="—" onchange="updateDaily(${i},'speak',this.value)" style="width:52px"/></td>
+      <td><select onchange="updateDaily(${i},'mock',this.value)">
+        <option ${r.mock==='No'?'selected':''}>No</option>
+        <option ${r.mock==='Yes'?'selected':''}>Yes</option>
+      </select></td>
+      <td><input type="text" value="${r.score||''}" placeholder="—" onchange="updateDaily(${i},'score',this.value)" style="width:80px"/></td>
+      <td style="background:${r.weak?'rgba(255,92,122,.08)':''}">
+        <select onchange="updateDaily(${i},'weak',this.value)">
+          <option value="">—</option>
+          ${['Listening','Reading','Writing','Speaking','Vocabulary','Grammar','Pronunciation','Fluency'].map(v=>`<option ${r.weak===v?'selected':''}>${v}</option>`).join('')}
+        </select></td>
+      <td><textarea rows="1" onchange="updateDaily(${i},'notes',this.value)">${r.notes||''}</textarea></td>
+
+```
+  <td><button class="btn-danger" onclick="deleteDailyRow(${i})">✕</button></td>
+</tr>`;
+```
+
+}).join(’’);
+document.getElementById(‘nb-daily’).textContent=state.daily.length;
+}
+
+function updateDaily(idx, key, val){
+state.daily[idx][key]=val; saveAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+WEEKLY PLANNER
+══════════════════════════════════════════════════════════════════════ */
+function renderWeekly(){
+const foci=[‘Listening’,‘Reading’,‘Writing’,‘Speaking’,‘Mixed’,‘Writing’,‘Mixed’,‘All Modules’];
+const container=document.getElementById(‘week-cards-container’);
+container.innerHTML=state.weekly.map((w,i)=>{
+const sd = addDays(state.startDate, i*7);
+const ed = addDays(state.startDate, i*7+6);
+return `<div class="week-card" data-week="${w.week}"> <h4>Week ${w.week} &nbsp;<span style="font-size:.75rem;color:var(--muted);font-weight:400">${fmtDate(sd)} — ${fmtDate(ed)}</span></h4> <div class="week-meta"> <span>Focus: <b>${w.focus}</b></span> <span>Planned: <b>${w.planned}</b> mock tests</span> </div> <label style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Weekly Goal</label> <textarea class="wc-input" rows="2" onchange="updateWeekly(${i},'goal',this.value)">${w.goal||''}</textarea> <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"> <div> <label style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Mock Tests Done</label> <input class="wc-input" type="number" min="0" max="7" value="${w.completed||''}" placeholder="0" onchange="updateWeekly(${i},'completed',this.value)"/> </div> <div> <label style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Focus Area</label> <select class="wc-input" onchange="updateWeekly(${i},'focus',this.value)"> ${['Listening','Reading','Writing','Speaking','Mixed','All Modules'].map(f=>`<option ${w.focus===f?‘selected’:’’}>${f}</option>`).join('')} </select> </div> </div> <label style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Key Improvements</label> <textarea class="wc-input" rows="2" placeholder="What improved this week?" onchange="updateWeekly(${i},'improvements',this.value)">${w.improvements||''}</textarea> <label style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Challenges</label> <textarea class="wc-input" rows="2" placeholder="What was difficult?" onchange="updateWeekly(${i},'challenges',this.value)">${w.challenges||''}</textarea> ${w.completed!==''?`<div class="prog-wrap" style="margin-top:8px"><div class="prog-bar" style="width:${Math.min((+w.completed/w.planned)*100,100)}%"></div></div>`:''} </div>`;
+}).join(’’);
+}
+
+function updateWeekly(idx, key, val){ state.weekly[idx][key]=val; saveAll(); toast(‘Saved ✓’); }
+
+/* ══════════════════════════════════════════════════════════════════════
+SCORE TRACKER
+══════════════════════════════════════════════════════════════════════ */
+let scoreChartInst;
+function addScoreEntry(){
+const date=document.getElementById(‘sc-date’).value;
+if(!date){toast(‘Please select a date’,‘⚠️’);return;}
+state.scores.push({
+date,
+l:document.getElementById(‘sc-l’).value,
+r:document.getElementById(‘sc-r’).value,
+w:document.getElementById(‘sc-w’).value,
+s:document.getElementById(‘sc-s’).value,
+notes:document.getElementById(‘sc-notes’).value,
+});
+saveAll();
+[‘sc-date’,‘sc-l’,‘sc-r’,‘sc-w’,‘sc-s’,‘sc-notes’].forEach(id=>document.getElementById(id).value=’’);
+renderScores(); toast(‘Score saved!’);
+}
+
+function deleteScore(idx){
+if(!confirm(‘Delete this score?’)) return;
+state.scores.splice(idx,1); saveAll(); renderScores(); toast(‘Deleted’,‘🗑️’);
+}
+
+function updateScore(idx,key,val){ state.scores[idx][key]=val; saveAll(); renderScoreChart(); }
+
+function renderScores(){
+// Averages
+const sc = state.scores.filter(s=>s.l||s.r||s.w||s.s);
+const avg = k => sc.length ? (sc.reduce((a,b)=>a+(+b[k]||0),0)/sc.length).toFixed(1) : ‘—’;
+const avgs=[{k:‘l’,label:‘Listening’,color:‘var(–p1)’},{k:‘r’,label:‘Reading’,color:‘var(–p3)’},
+{k:‘w’,label:‘Writing’,color:‘var(–p2)’},{k:‘s’,label:‘Speaking’,color:‘var(–p4)’}];
+document.getElementById(‘score-avg-display’).innerHTML = avgs.map(({k,label,color})=>{
+const v=avg(k); const pct=v!==’—’?Math.min((+v/7)*100,100):0;
+return `<div> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"> <span style="font-size:.83rem;font-weight:600">${label}</span> <span style="font-size:.85rem;font-weight:700;color:${color}">${v} <span style="font-size:.72rem;color:var(--muted)">/ 12</span></span> </div> <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${color}"></div></div> </div>`;
+}).join(’’);
+
+// Table
+document.getElementById(‘score-body’).innerHTML = state.scores.length
+? state.scores.map((s,i)=>{
+const clb = (s.l&&s.r&&s.w&&s.s) ? Math.floor(((+s.l||0)+(+s.r||0)+(+s.w||0)+(+s.s||0))/4) : ‘—’;
+const sc = v => {
+const n=+v; if(!v||isNaN(n)) return ‘<td>—</td>’;
+const cls=n>=7?‘score-hi’:n>=5?‘score-mid’:‘score-lo’;
+return `<td style="text-align:center"><span class="score-pill ${cls}">${n}</span></td>`;
+};
+return `<tr> <td><input type="date" value="${s.date||''}" onchange="updateScore(${i},'date',this.value)"/></td> ${sc(s.l)}${sc(s.r)}${sc(s.w)}${sc(s.s)} <td style="text-align:center;font-family:var(--font-head);font-weight:800;color:${+clb>=7?'var(--p3)':'var(--muted)'}">${clb}</td> <td><input type="text" value="${s.notes||''}" placeholder="—" onchange="updateScore(${i},'notes',this.value)"/></td> <td><button class="btn-danger" onclick="deleteScore(${i})">✕</button></td> </tr>`;
+}).join(’’)
+: ‘<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">No scores yet — add your first mock test score!</td></tr>’;
+
+renderScoreChart();
+}
+
+function renderScoreChart(){
+const ctx=document.getElementById(‘scoreChart’).getContext(‘2d’);
+if(scoreChartInst) scoreChartInst.destroy();
+const sc = state.scores.slice(-12);
+scoreChartInst = new Chart(ctx,{
+type:‘line’,
+data:{
+labels: sc.length ? sc.map(s=>fmtDate(s.date)) : [‘No data’],
+datasets:[
+{label:‘Listening’,data:sc.map(s=>+s.l||null),borderColor:’#6c47ff’,pointBackgroundColor:’#6c47ff’,tension:.4,borderWidth:2.5},
+{label:‘Reading’,  data:sc.map(s=>+s.r||null),borderColor:’#00c9a7’,pointBackgroundColor:’#00c9a7’,tension:.4,borderWidth:2.5},
+{label:‘Writing’,  data:sc.map(s=>+s.w||null),borderColor:’#ff5c7a’,pointBackgroundColor:’#ff5c7a’,tension:.4,borderWidth:2.5},
+{label:‘Speaking’, data:sc.map(s=>+s.s||null),borderColor:’#ffb830’,pointBackgroundColor:’#ffb830’,tension:.4,borderWidth:2.5},
+{label:‘CLB 7 Target’,data:sc.length?Array(sc.length).fill(7):null,borderColor:‘rgba(0,0,0,.2)’,borderDash:[6,4],borderWidth:1.5,pointRadius:0,tension:0},
+]
+},
+options:{responsive:true,maintainAspectRatio:false,
+scales:{y:{min:0,max:12,ticks:{stepSize:1,font:{size:11}},grid:{color:‘rgba(0,0,0,.04)’}},
+x:{grid:{display:false},ticks:{font:{size:10}}}},
+plugins:{legend:{position:‘bottom’,labels:{font:{size:11},boxWidth:12}},
+tooltip:{mode:‘index’,intersect:false}}}
+});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+STUDY PLAN
+══════════════════════════════════════════════════════════════════════ */
+const modColors={
+“Listening”:“b-listen”,“Reading”:“b-read”,“Writing”:“b-write”,
+“Speaking”:“b-speak”,“Mixed Review”:“b-mixed”,
+“Mock Test”:“b-mock”,“Mock Review”:“b-mock”
+};
+
+let planFilter=‘all’;
+function filterPlan(f, btn){
+planFilter=f;
+document.querySelectorAll(’#page-plan .tab-btn’).forEach(b=>b.classList.remove(‘active’));
+btn.classList.add(‘active’);
+renderPlan(f);
+}
+
+function renderPlan(filter){
+const done=state.plan.filter(r=>r.done).length;
+document.getElementById(‘plan-count’).textContent=done;
+document.getElementById(‘plan-prog’).style.width=Math.round(done/56*100)+’%’;
+
+const items = filter===‘pending’ ? state.plan.filter(r=>!r.done)
+: filter===‘done’   ? state.plan.filter(r=>r.done)
+: state.plan;
+
+let html=’<div>’;
+let lastWeek=0;
+items.forEach((p,i)=>{
+if(p.week!==lastWeek){
+const sd=addDays(state.startDate,(p.week-1)*7);
+html+=`<div style="padding:10px 14px 6px;font-family:var(--font-head);font-size:.8rem;font-weight:700;color:var(--p1);background:linear-gradient(90deg,rgba(108,71,255,.06),transparent);border-bottom:1px solid var(--border)"> 📅 Week ${p.week} — starting ${fmtDate(sd)} </div>`;
+lastWeek=p.week;
+}
+const dateStr=addDays(state.startDate,p.day-1);
+html+=`<div class="plan-day ${p.done?'completed':''}" id="pday-${p.day}"> <div class="day-num">${p.day}</div> <div style="font-size:.78rem;color:var(--muted)">${fmtDate(dateStr)}</div> <span class="badge ${modColors[p.mod]||'b-mixed'}">${p.mod}</span> <div style="flex:1"> <div class="plan-tasks" contenteditable="true" onblur="updatePlanTask(${state.plan.indexOf(p)},this.textContent)">${p.task}</div> <div style="font-size:.72rem;color:var(--muted);margin-top:2px">⏱ ${p.time} min</div> </div> <div style="font-size:.75rem;color:var(--muted)">${p.time}m</div> <input type="checkbox" class="plan-check" ${p.done?'checked':''} onchange="togglePlan(${state.plan.indexOf(p)},this.checked)"/> </div>`;
+});
+html+=’</div>’;
+document.getElementById(‘plan-container’).innerHTML=html;
+}
+
+function togglePlan(idx,val){
+state.plan[idx].done=val; saveAll();
+const done=state.plan.filter(r=>r.done).length;
+document.getElementById(‘plan-count’).textContent=done;
+document.getElementById(‘plan-prog’).style.width=Math.round(done/56*100)+’%’;
+document.getElementById(‘stat-plan’).textContent=Math.round(done/56*100)+’%’;
+const row=document.getElementById(‘pday-’+state.plan[idx].day);
+if(row) row.classList.toggle(‘completed’,val);
+toast(val?‘Day marked complete! 🎉’:‘Marked incomplete’);
+}
+
+function updatePlanTask(idx,val){ state.plan[idx].task=val; saveAll(); }
+
+function resetPlan(){
+if(!confirm(‘Reset all plan checkboxes?’)) return;
+state.plan.forEach(p=>p.done=false); saveAll(); renderPlan(planFilter); toast(‘Plan reset’,‘↺’);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+RESOURCES
+══════════════════════════════════════════════════════════════════════ */
+const tagColors={
+‘YouTube’:’#ffe4e4’,‘Website’:’#e4f0ff’,‘App’:’#e4ffe9’,
+‘Book’:’#fff4e4’,‘PDF’:’#f4e4ff’,‘Community’:’#e4f8ff’,‘Official’:’#e8ffe8’
+};
+const tagText={
+‘YouTube’:’#c0392b’,‘Website’:’#2980b9’,‘App’:’#27ae60’,
+‘Book’:’#c07a00’,‘PDF’:’#8e44ad’,‘Community’:’#0097a7’,‘Official’:’#1a7a3a’
+};
+const modTag={
+‘Listening’:‘b-listen’,‘Reading’:‘b-read’,‘Writing’:‘b-write’,
+‘Speaking’:‘b-speak’,‘All Modules’:‘b-mixed’
+};
+
+function addResource(){
+const name=document.getElementById(‘rname’).value.trim();
+if(!name){toast(‘Please enter a name’,‘⚠️’);return;}
+state.resources.push({
+mod:document.getElementById(‘rmod’).value,
+type:document.getElementById(‘rtype’).value,
+name, url:document.getElementById(‘rurl’).value,
+notes:document.getElementById(‘rnotes’).value, stars:2
+});
+saveAll();
+[‘rname’,‘rurl’,‘rnotes’].forEach(id=>document.getElementById(id).value=’’);
+renderResources(document.querySelector(’#res-tabs .tab-btn.active’)?.textContent.replace(/[^\w\s]/g,’’).trim()||‘all’);
+toast(‘Resource added!’);
+}
+
+function deleteResource(idx){
+if(!confirm(‘Delete this resource?’)) return;
+state.resources.splice(idx,1); saveAll(); renderResources(‘all’); toast(‘Deleted’,‘🗑️’);
+}
+
+let resFilter=‘all’;
+function filterRes(f,btn){
+resFilter=f;
+document.querySelectorAll(’#res-tabs .tab-btn’).forEach(b=>b.classList.remove(‘active’));
+btn.classList.add(‘active’);
+renderResources(f);
+}
+
+function renderResources(filter){
+let items = filter===‘all’ ? state.resources : state.resources.filter(r=>r.mod===filter||r.mod===‘All Modules’);
+const grid=document.getElementById(‘res-grid’);
+if(!items.length){grid.innerHTML=’<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:32px">No resources in this category yet.</p>’;return;}
+grid.innerHTML=items.map((r,i)=>{
+const realIdx=state.resources.indexOf(r);
+const bg=tagColors[r.type]||’#f0f0f0’;
+const tc=tagText[r.type]||’#555’;
+return `<div class="res-card"> <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"> <span class="res-card-tag" style="background:${bg};color:${tc}">${r.type}</span> <span class="badge ${modTag[r.mod]||'b-mixed'}" style="font-size:.68rem">${r.mod}</span> </div> <h5 contenteditable="true" onblur="state.resources[${realIdx}].name=this.textContent;saveAll()">${r.name}</h5> <p contenteditable="true" onblur="state.resources[${realIdx}].notes=this.textContent;saveAll()">${r.notes||'No description'}</p> <div style="display:flex;justify-content:space-between;align-items:center"> ${r.url?`<a href="${r.url}" target="_blank" rel="noopener">🔗 Visit Resource</a>`:'<span style="color:var(--muted);font-size:.78rem">No URL</span>'} <button class="btn-danger" onclick="deleteResource(${realIdx})" style="padding:3px 8px;font-size:.7rem">✕</button> </div> </div>`;
+}).join(’’);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+INIT
+══════════════════════════════════════════════════════════════════════ */
+function init(){
+// Set start date in sidebar
+document.getElementById(‘globalStartDate’).value = state.startDate;
+// Set today’s date as default in forms
+const today = new Date().toISOString().slice(0,10);
+document.getElementById(‘f-date’).value = today;
+document.getElementById(‘sc-date’).value = today;
+// Update nav badge
+document.getElementById(‘nb-daily’).textContent = state.daily.length;
+// Render dashboard
+renderDashboard();
+}
+
+init();
+</script>
+
+</body>
+</html>
